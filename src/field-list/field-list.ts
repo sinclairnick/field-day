@@ -1,6 +1,6 @@
 import { atom, useAtom } from "jotai";
 import { FieldActions, FieldMeta, FieldProps, FieldValue } from "../common/common.types";
-import { FieldListItemActions, FieldMapList, StateMapList, ValueMapList } from "./field-list.types";
+import { FieldMapList, StateMapList, ValueMapList } from "./field-list.types";
 
 const generateMetaFromValue = <F extends FieldValue>(value: F) => {
 	const meta: FieldMeta<typeof value> = {
@@ -65,7 +65,7 @@ export const createFieldList = <I extends ValueMapList>(initialValues: I) => {
 				setState({ ...state, items: newItems })
 			},
 			remove: (index: number) => {
-				const newItems = state.items.filter((x, i) => i !== index)
+				const newItems = state.items.filter((_, i) => i !== index)
 				setState({ ...state, items: newItems })
 			},
 			reset: (to?: StateMapList<I>) => {

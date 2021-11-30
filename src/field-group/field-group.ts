@@ -69,7 +69,7 @@ export const createFieldGroup = <I extends ValueMap>(initialValues: I) => {
         value: typeof value === 'boolean' ? undefined : (value as any),
       };
       const meta = state.items[key];
-      const isDirty = initialValues[key] !== meta.value
+      const isDirty = initialValues[key] !== meta.value as any
       fields[key] = { meta: { ...meta, isDirty }, props, actions, };
     }
 
