@@ -47,12 +47,7 @@ export const createFieldGroup = <V extends ValueMap>(_initialValues: V) => {
         const errors = opts?.validate?.(state.items)
         const newState = { ...state }
         for (const key in state.items) {
-          if (errors !== undefined && key in errors) {
-            const error = errors[key]
-            newState.items[key].error = error ?? undefined
-          } else {
-            newState.items[key].error = undefined
-          }
+          newState.items[key].error = errors?.[key] ?? undefined
         }
         setState(newState)
       },
@@ -68,7 +63,6 @@ export const createFieldGroup = <V extends ValueMap>(_initialValues: V) => {
         setInitialValues(values)
         const newInitialState = generateStateFromValues(values)
         setInitialState(newInitialState)
-        console.log(newInitialState, resetState)
         if (resetState) {
           setState(newInitialState)
         }
@@ -79,7 +73,7 @@ export const createFieldGroup = <V extends ValueMap>(_initialValues: V) => {
       if (hasStateChanged) {
         actions.validate()
       }
-    }, [hasStateChanged])
+    }, [hasStateChanged, actions.validate])
 
 
     const fields = {} as FieldMap<I>;

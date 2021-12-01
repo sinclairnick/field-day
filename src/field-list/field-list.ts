@@ -69,14 +69,8 @@ export const createFieldList = <V extends ValueMapList>(_initialValues: V) => {
 				for (const idx in state.items) {
 					const item = state.items[idx]
 					const errors = opts?.validateRow?.(item, Number(idx), state.items)
-					console.log(errors)
 					for (const key in state.items[idx]) {
-						if (errors !== undefined) {
-							const error = errors[key]
-							newState.items[idx][key].error = error
-						} else {
-							newState.items[idx][key].error = undefined
-						}
+						newState.items[idx][key].error = errors?.[key] ?? undefined
 					}
 				}
 				const listError = opts?.validateList?.(state.items)

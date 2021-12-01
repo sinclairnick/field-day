@@ -33,6 +33,7 @@ const Index = () => {
 			if (meta.length > 3) {
 				return "You have too many friends, sorry"
 			}
+			return
 		},
 		validateRow: (meta) => {
 			if (meta.name.value === "Nigel") {
