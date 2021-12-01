@@ -14,9 +14,11 @@ const useFriendsList = createFieldList<{
 }[]>([{ name: "Jimmy", relationship: "Best friend" }])
 
 const useTitle = createField("")
+const usePicture = createField<File[]>([])
 
 const Index = () => {
 	const title = useTitle({ validate: (meta) => meta.value.length > 10 ? "Title too long" : undefined })
+	const picture = usePicture()
 	const profile = useProfileGroup({
 		validate: (items) => {
 			const { isOver18, age } = items
@@ -53,8 +55,11 @@ const Index = () => {
 					<h1>Field ("Title")</h1>
 					<p>Title meta</p>
 					<pre>{JSON.stringify(title.meta)}</pre>
+					<p>Picture meta</p>
+					<pre>{JSON.stringify(picture.meta)}</pre>
 					<label htmlFor='title'>Title</label>
 					<input id="title" {...title.props} />
+					<input type="file" {...picture.props} />
 				</fieldset>
 			</Box>
 

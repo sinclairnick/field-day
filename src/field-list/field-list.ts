@@ -2,9 +2,9 @@ import { atom, useAtom } from "jotai";
 import merge from "lodash/merge";
 import cloneDeep from "lodash/cloneDeep";
 import { useEffect, useState } from "react";
-import { DeepPartial, FieldActions, FieldMeta, FieldProps, FieldValue, Widen } from "../common/common.types";
+import { DeepPartial, FieldActions, FieldMeta, FieldValue, Widen } from "../common/common.types";
 import { FieldMapList, StateMapList, ValueMapList } from "./field-list.types";
-import { usePrevious } from "../common/common.constants";
+import { generateFieldProps, usePrevious } from "../common/common.constants";
 import { UseFieldListOptions } from "..";
 import { isEqual } from "lodash";
 
@@ -53,15 +53,6 @@ export const createFieldList = <V extends ValueMapList>(_initialValues: V) => {
 
 		const previousState = usePrevious(state)
 		const hasStateChanged = !isEqual(previousState, state)
-
-		state.items.length !== previousState?.items?.length || state.items.some((item, i) => {
-			const prevItem = previousState.items[i]
-			return Object.keys(item).some(key => {
-				const eq = isEqual(item[key], prevItem[key])
-				console.log(eq, prevItem[key], item[key])
-				return !eq
-			})
-		})
 
 		const listActions = {
 			validate: () => {
@@ -137,7 +128,6 @@ export const createFieldList = <V extends ValueMapList>(_initialValues: V) => {
 				fields[i] = {} as any
 			}
 			for (const key in item) {
-				type ValueType = I[number][typeof key];
 				const value = item[key].value;
 
 				const actions: FieldActions<FieldValue> = {
@@ -148,22 +138,8 @@ export const createFieldList = <V extends ValueMapList>(_initialValues: V) => {
 					}
 				};
 
-				const props: FieldProps<ValueType> = {
-					onBlur: () => actions.setMeta({ isFocussed: false, wasTouched: true }),
-					onChange: (e) => {
-						if (typeof value === 'boolean' && 'checked' in e.target) {
-							actions.setMeta({ value: e.target.checked });
-							return;
-						}
-						if ('value' in e.target) {
-							actions.setMeta({ value: e.target.value });
-							return;
-						}
-					},
-					onFocus: () => actions.setMeta({ isFocussed: true }),
-					checked: typeof value === 'boolean' ? value : (undefined as any),
-					value: typeof value === 'boolean' ? undefined : (value as any),
-				};
+				const props = generateFieldProps(value, actions)
+
 				const meta = item[key];
 				const isDirty = initialValues[i]?.[key] !== meta.value
 				fields[i][key] = { meta: { ...meta, isDirty }, props, actions };

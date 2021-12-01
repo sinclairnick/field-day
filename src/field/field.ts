@@ -1,8 +1,8 @@
 import { atom, useAtom } from "jotai";
 import { isEqual } from "lodash";
 import { useEffect, useState } from "react";
-import { FieldActions, FieldMeta, FieldProps, FieldValue, Widen } from "..";
-import { usePrevious } from "../common/common.constants";
+import { FieldActions, FieldMeta, FieldValue, Widen } from "..";
+import { generateFieldProps, usePrevious } from "../common/common.constants";
 import { UseFieldOptions } from "./field.types";
 
 const generateMetaFromValue = <V extends FieldValue>(value: V) => {
@@ -26,6 +26,7 @@ export const createField = <V extends FieldValue>(_initialValue: V) => {
 		const [state, setState] = useAtom(fieldAtom)
 
 		const { value } = state
+		const isFileList = Array.isArray(value)
 
 		const previousState = usePrevious(state)
 		const hasStateChange = !isEqual(previousState, state)
@@ -54,24 +55,7 @@ export const createField = <V extends FieldValue>(_initialValue: V) => {
 			},
 		}
 
-		const props: FieldProps<I> = {
-			onBlur: () => {
-				actions.setMeta({ isFocussed: false, wasTouched: true })
-			},
-			onChange: (e) => {
-				if (typeof value === 'boolean' && 'checked' in e.target) {
-					actions.setMeta({ value: e.target.checked });
-					return;
-				}
-				if ('value' in e.target) {
-					actions.setMeta({ value: e.target.value });
-					return;
-				}
-			},
-			onFocus: () => actions.setMeta({ isFocussed: true }),
-			checked: typeof value === 'boolean' ? value : (undefined as any),
-			value: typeof value === 'boolean' ? undefined : (value as any),
-		}
+		const props = generateFieldProps(value, actions)
 
 		useEffect(() => {
 			if (hasStateChange) {
@@ -91,8 +75,4 @@ export const createField = <V extends FieldValue>(_initialValue: V) => {
 	}
 
 	return useField
-}
-
-export const useField = <I extends FieldValue>(opts: UseFieldOptions<I>) => {
-
 }

@@ -1,8 +1,8 @@
 import { atom, useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { UseFieldGroupOptions } from '..';
-import { usePrevious } from '../common/common.constants';
-import { DeepPartial, FieldActions, FieldMeta, FieldProps, FieldValue, Widen } from '../common/common.types';
+import { generateFieldProps, usePrevious } from '../common/common.constants';
+import { DeepPartial, FieldActions, FieldMeta, FieldValue, Widen } from '../common/common.types';
 import { FieldMap, StateMap, ValueMap, } from './field-group.types';
 import merge from "lodash/merge"
 import isEqual from "lodash/isEqual"
@@ -78,7 +78,6 @@ export const createFieldGroup = <V extends ValueMap>(_initialValues: V) => {
 
     const fields = {} as FieldMap<I>;
     for (const key in state.items) {
-      type ValueType = I[typeof key];
       const value = state.items[key].value;
 
       const actions: FieldActions<FieldValue> = {
@@ -87,25 +86,8 @@ export const createFieldGroup = <V extends ValueMap>(_initialValues: V) => {
           setState({ ...state, items: newItems });
         },
       };
+      const props = generateFieldProps(value, actions)
 
-      const props: FieldProps<ValueType> = {
-        onBlur: () => {
-          actions.setMeta({ isFocussed: false, wasTouched: true })
-        },
-        onChange: (e) => {
-          if (typeof value === 'boolean' && 'checked' in e.target) {
-            actions.setMeta({ value: e.target.checked });
-            return;
-          }
-          if ('value' in e.target) {
-            actions.setMeta({ value: e.target.value });
-            return;
-          }
-        },
-        onFocus: () => actions.setMeta({ isFocussed: true }),
-        checked: typeof value === 'boolean' ? value : (undefined as any),
-        value: typeof value === 'boolean' ? undefined : (value as any),
-      };
       const meta = state.items[key];
       const isDirty = initialValues[key] !== meta.value as any
       fields[key] = { meta: { ...meta, isDirty }, props, actions, };
