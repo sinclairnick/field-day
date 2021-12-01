@@ -7,6 +7,7 @@ import { FieldMap, StateMap, ValueMap, } from './field-group.types';
 import merge from "lodash/merge"
 import isEqual from "lodash/isEqual"
 import { DeepPartial, Widen } from '../util/util.types';
+import { useDelayedEffect } from '../util/use-delayed-effect';
 
 const generateStateFromValues = <V extends ValueMap>(valueMap: V) => {
   const initialState = {
@@ -47,7 +48,7 @@ export const createFieldGroup = <V extends ValueMap>(_initialValues: V) => {
     const [initialValues, setInitialValues] = useState(_initialValues as I)
     const [initialState, setInitialState] = useState(_initialState)
     const [state, setState] = useAtom(fieldGroupAtom);
-
+    const { validationDelay = 100 } = opts ?? {}
 
     const previousState = usePrevious(state)
     const hasStateChanged = !isEqual(previousState, state)
@@ -80,11 +81,11 @@ export const createFieldGroup = <V extends ValueMap>(_initialValues: V) => {
       }
     }
 
-    useEffect(() => {
+    useDelayedEffect(() => {
       if (hasStateChanged) {
         actions.validate()
       }
-    }, [hasStateChanged, actions.validate])
+    }, [hasStateChanged, actions.validate, validationDelay], validationDelay)
 
 
     const fields = {} as FieldMap<I>;

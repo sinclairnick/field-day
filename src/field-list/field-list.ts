@@ -8,6 +8,7 @@ import { generateFieldProps, usePrevious } from "../common/common.constants";
 import { UseFieldListOptions } from "..";
 import { isEqual } from "lodash";
 import { DeepPartial, Widen } from "../util/util.types";
+import { useDelayedEffect } from "../util/use-delayed-effect";
 
 const generateMetaFromValue = <F extends FieldValue>(value: F) => {
 	const meta: FieldMeta<typeof value> = {
@@ -57,6 +58,7 @@ export const createFieldList = <V extends ValueMapList>(_initialValues: V) => {
 	const useFieldList = (opts?: UseFieldListOptions<I>) => {
 		const [initialValues, setInitialValues] = useState(_initialValues as I)
 		const [initialState, setInitialState] = useState(_initialState)
+		const { validationDelay = 100 } = opts ?? {}
 
 		const [state, setState] = useAtom(fieldListAtom)
 
@@ -65,7 +67,7 @@ export const createFieldList = <V extends ValueMapList>(_initialValues: V) => {
 
 		const listActions = {
 			validate: () => {
-				const newState = cloneDeep(state)
+				const newState = { ...state }
 				for (const idx in state.items) {
 					const item = state.items[idx]
 					const errors = opts?.validateRow?.(item, Number(idx), state.items)
@@ -125,11 +127,11 @@ export const createFieldList = <V extends ValueMapList>(_initialValues: V) => {
 			}
 		}
 
-		useEffect(() => {
+		useDelayedEffect(() => {
 			if (hasStateChanged) {
 				listActions.validate()
 			}
-		}, [hasStateChanged, listActions.validate])
+		}, [hasStateChanged, listActions.validate], validationDelay)
 
 		const fields = [] as FieldMapList<I>;
 		for (const i in state.items) {

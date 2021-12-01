@@ -3,6 +3,7 @@ import { isEqual } from "lodash";
 import { useEffect, useState } from "react";
 import { FieldActions, FieldMeta, FieldValue } from "..";
 import { generateFieldProps, usePrevious } from "../common/common.constants";
+import { useDelayedEffect } from "../util/use-delayed-effect";
 import { Widen } from "../util/util.types";
 import { UseFieldOptions } from "./field.types";
 
@@ -34,6 +35,7 @@ export const createField = <V extends FieldValue>(_initialValue: V) => {
 		const [initialValue, setInitialValue] = useState(_initialValue as I)
 		const [initialState, setInitialState] = useState(_initialState as FieldMeta<I>)
 		const [state, setState] = useAtom(fieldAtom)
+		const { validationDelay = 100 } = opts ?? {}
 
 		const { value } = state
 
@@ -66,11 +68,11 @@ export const createField = <V extends FieldValue>(_initialValue: V) => {
 
 		const props = generateFieldProps(value, actions)
 
-		useEffect(() => {
+		useDelayedEffect(() => {
 			if (hasStateChange) {
 				otherActions.validate()
 			}
-		}, [hasStateChange, otherActions.validate])
+		}, [hasStateChange, otherActions.validate], validationDelay)
 
 		return {
 			actions: {
