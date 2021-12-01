@@ -7,7 +7,6 @@ import {
 	FormLabel,
 	Grid,
 	TextField,
-	Typography,
 } from '@mui/material';
 
 const useProfileGroup = createFieldGroup({
@@ -21,8 +20,33 @@ const useFriendsList = createFieldList<{
 }[]>([{ name: "Jimmy", relationship: "Best friend" }])
 
 const Index = () => {
-	const profile = useProfileGroup();
-	const friends = useFriendsList()
+	const profile = useProfileGroup({
+		validate: (items) => {
+			const { isOver18, age } = items
+			const invalidAge = isOver18.value && Number(age.value) < 18
+			if (invalidAge) {
+				return {
+					age: "Must be over 18"
+				}
+			}
+		}
+	});
+	const friends = useFriendsList({
+		validateList: (meta) => {
+			if (meta.length > 3) {
+				return "You have too many friends, sorry"
+			}
+		},
+		validateRow: (meta) => {
+			if (meta.name.value === "Nigel") {
+				return { name: "Sorry, this guy has no mates" }
+			}
+		}
+	})
+
+	const handleSetInitialValues = () => {
+		profile.actions.setInitialValues({ isOver18: true, age: "12", name: "Johnny" })
+	}
 
 	return (
 		<Box>
@@ -51,6 +75,7 @@ const Index = () => {
 								type="checkbox"
 								{...profile.fields.isOver18.props}
 							/>
+							<button onClick={handleSetInitialValues}>Set initial state</button>
 						</fieldset>
 					</Grid>
 

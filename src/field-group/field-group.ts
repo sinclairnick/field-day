@@ -1,6 +1,11 @@
 import { atom, useAtom } from 'jotai';
-import { FieldActions, FieldMeta, FieldProps, FieldValue } from '../common/common.types';
+import { useEffect, useState } from 'react';
+import { UseFieldGroupOptions } from '..';
+import { usePrevious } from '../common/common.constants';
+import { DeepPartial, FieldActions, FieldMeta, FieldProps, FieldValue, Widen } from '../common/common.types';
 import { FieldMap, StateMap, ValueMap, } from './field-group.types';
+import merge from "lodash/merge"
+import isEqual from "lodash/isEqual"
 
 const generateStateFromValues = <V extends ValueMap>(valueMap: V) => {
   const initialState = {
@@ -23,20 +28,59 @@ const generateStateFromValues = <V extends ValueMap>(valueMap: V) => {
   return initialState;
 };
 
-export const createFieldGroup = <I extends ValueMap>(initialValues: I) => {
-  const initialState = generateStateFromValues(initialValues);
-  const fieldGroupAtom = atom(initialState);
+export const createFieldGroup = <V extends ValueMap>(_initialValues: V) => {
+  type I = Widen<V>
+  const _initialState = generateStateFromValues(_initialValues) as StateMap<I>
+  const fieldGroupAtom = atom(_initialState);
 
-  const useForm = () => {
-    const [_state, setState] = useAtom(fieldGroupAtom);
+  const useFieldGroup = (opts?: UseFieldGroupOptions<I>) => {
+    const [initialValues, setInitialValues] = useState(_initialValues as I)
+    const [initialState, setInitialState] = useState(_initialState)
+    const [state, setState] = useAtom(fieldGroupAtom);
 
-    const state = _state as StateMap<I>; // Jotai removes type info
+
+    const previousState = usePrevious(state)
+    const hasStateChanged = !isEqual(previousState, state)
 
     const actions = {
-      reset: (to?: StateMap<I>) => {
-        setState(to ?? initialState)
+      validate: () => {
+        const errors = opts?.validate?.(state.items)
+        const newState = { ...state }
+        for (const key in state.items) {
+          if (errors !== undefined && key in errors) {
+            const error = errors[key]
+            newState.items[key].error = error ?? undefined
+          } else {
+            newState.items[key].error = undefined
+          }
+        }
+        setState(newState)
+      },
+      setState,
+      reset: () => {
+        setState(initialState)
+      },
+      updateState: (to: DeepPartial<StateMap<I>>) => {
+        setState(merge({ ...initialState }, { ...to }))
+      },
+      setInitialValues: (values: I, opts?: { resetState?: boolean }) => {
+        const { resetState = true } = opts ?? {}
+        setInitialValues(values)
+        const newInitialState = generateStateFromValues(values)
+        setInitialState(newInitialState)
+        console.log(newInitialState, resetState)
+        if (resetState) {
+          setState(newInitialState)
+        }
       }
     }
+
+    useEffect(() => {
+      if (hasStateChanged) {
+        actions.validate()
+      }
+    }, [hasStateChanged])
+
 
     const fields = {} as FieldMap<I>;
     for (const key in state.items) {
@@ -89,9 +133,8 @@ export const createFieldGroup = <I extends ValueMap>(initialValues: I) => {
       fields,
       meta: groupMeta,
       actions,
-      setState
     }
   };
 
-  return useForm;
+  return useFieldGroup;
 };

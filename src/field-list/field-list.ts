@@ -1,6 +1,12 @@
 import { atom, useAtom } from "jotai";
-import { FieldActions, FieldMeta, FieldProps, FieldValue } from "../common/common.types";
+import merge from "lodash/merge";
+import cloneDeep from "lodash/cloneDeep";
+import { useEffect, useState } from "react";
+import { DeepPartial, FieldActions, FieldMeta, FieldProps, FieldValue, Widen } from "../common/common.types";
 import { FieldMapList, StateMapList, ValueMapList } from "./field-list.types";
+import { usePrevious } from "../common/common.constants";
+import { UseFieldListOptions } from "..";
+import { isEqual } from "lodash";
 
 const generateMetaFromValue = <F extends FieldValue>(value: F) => {
 	const meta: FieldMeta<typeof value> = {
@@ -14,6 +20,7 @@ const generateMetaFromValue = <F extends FieldValue>(value: F) => {
 
 const generateStateFromValues = <V extends ValueMapList>(valueMapList: V) => {
 	const initialState = {
+		listError: undefined,
 		items: [],
 		wasTouched: false,
 	} as StateMapList<V>;
@@ -33,16 +40,62 @@ const generateStateFromValues = <V extends ValueMapList>(valueMapList: V) => {
 };
 
 
-export const createFieldList = <I extends ValueMapList>(initialValues: I) => {
-	const initialState = generateStateFromValues(initialValues)
-	const fieldListAtom = atom(initialState);
+export const createFieldList = <V extends ValueMapList>(_initialValues: V) => {
+	type I = Widen<V>
+	const _initialState = generateStateFromValues(_initialValues as I)
+	const fieldListAtom = atom(_initialState);
 
-	const useForm = () => {
-		const [_state, setState] = useAtom(fieldListAtom)
+	const useFieldList = (opts?: UseFieldListOptions<I>) => {
+		const [initialValues, setInitialValues] = useState(_initialValues as I)
+		const [initialState, setInitialState] = useState(_initialState)
 
-		const state = _state as StateMapList<I>; // Jotai removes type info
+		const [state, setState] = useAtom(fieldListAtom)
+
+		const previousState = usePrevious(state)
+		const hasStateChanged = !isEqual(previousState, state)
+
+		state.items.length !== previousState?.items?.length || state.items.some((item, i) => {
+			const prevItem = previousState.items[i]
+			return Object.keys(item).some(key => {
+				const eq = isEqual(item[key], prevItem[key])
+				console.log(eq, prevItem[key], item[key])
+				return !eq
+			})
+		})
 
 		const listActions = {
+			validate: () => {
+				const newState = cloneDeep(state)
+				for (const idx in state.items) {
+					const item = state.items[idx]
+					const errors = opts?.validateRow?.(item, Number(idx), state.items)
+					console.log(errors)
+					for (const key in state.items[idx]) {
+						if (errors !== undefined) {
+							const error = errors[key]
+							newState.items[idx][key].error = error
+						} else {
+							newState.items[idx][key].error = undefined
+						}
+					}
+				}
+				const listError = opts?.validateList?.(state.items)
+				newState.listError = listError ?? undefined
+				setState(newState)
+			},
+			setInitialValues: (values: I, opts?: { resetState?: boolean }) => {
+				const { resetState = true } = opts ?? {}
+				setInitialValues(values)
+				const newInitialState = generateStateFromValues(values)
+				setInitialState(newInitialState)
+				if (resetState) {
+					setState(newInitialState)
+				}
+			},
+			updateState: (to: DeepPartial<StateMapList<I>>) => {
+				setState(merge({ ...initialState }, { ...to }))
+			},
+			setState,
 			append: (values: I[number]) => {
 				const newItem = {} as StateMapList<I>["items"][number]
 				for (const key in values) {
@@ -72,10 +125,16 @@ export const createFieldList = <I extends ValueMapList>(initialValues: I) => {
 				setState(to ?? initialState)
 			},
 			set: (index: number, values: StateMapList<I>["items"][number]) => {
-				const newItems = [...state.items].map((x, i) => i === index ? values : x)
+				const newItems = cloneDeep(state.items).map((x, i) => i === index ? values : x)
 				setState({ ...state, items: newItems })
 			}
 		}
+
+		useEffect(() => {
+			if (hasStateChanged) {
+				listActions.validate()
+			}
+		}, [hasStateChanged, listActions.validate])
 
 		const fields = [] as FieldMapList<I>;
 		for (const i in state.items) {
@@ -139,9 +198,8 @@ export const createFieldList = <I extends ValueMapList>(initialValues: I) => {
 			fields,
 			meta: listMeta,
 			actions: listActions,
-			setState
 		}
 	}
 
-	return useForm
+	return useFieldList
 }
