@@ -1,7 +1,7 @@
 import { atom, useAtom } from "jotai";
 import merge from "lodash/merge";
 import cloneDeep from "lodash/cloneDeep";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FieldActions, FieldMeta, FieldValue } from "../common/common.types";
 import { FieldMapList, StateMapList, ValueMapList } from "./field-list.types";
 import { generateFieldProps, usePrevious } from "../common/common.constants";

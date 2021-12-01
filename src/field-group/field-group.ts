@@ -1,5 +1,5 @@
 import { atom, useAtom } from 'jotai';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { UseFieldGroupOptions } from '..';
 import { generateFieldProps, usePrevious } from '../common/common.constants';
 import { FieldActions, FieldMeta, FieldValue } from '../common/common.types';

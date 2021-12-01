@@ -1,6 +1,6 @@
 import { atom, useAtom } from "jotai";
 import { isEqual } from "lodash";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FieldActions, FieldMeta, FieldValue } from "..";
 import { generateFieldProps, usePrevious } from "../common/common.constants";
 import { useDelayedEffect } from "../util/use-delayed-effect";
