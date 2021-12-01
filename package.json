@@ -21,7 +21,7 @@
         "react": "^17.0.0",
         "react-dom": "^17.0.0"
     },
-    "name": "field-day",
+    "name": "@sinclairnick/field-day",
     "author": "Nick Sinclair",
     "module": "dist/index.esm.js",
     "devDependencies": {
