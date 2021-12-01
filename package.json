@@ -12,11 +12,17 @@
     },
     "scripts": {
         "dev": "next dev ./example",
-        "build": "microbundle build",
+        "build": "microbundle build -f esm,cjs",
         "size": "size-limit",
         "analyze": "size-limit",
         "prepublish": "npm run build"
     },
+    "size-limit": [
+        {
+            "path": "dist/index.js",
+            "limit": "10 kB"
+        }
+    ],
     "peerDependencies": {
         "react": "^17.0.0",
         "react-dom": "^17.0.0"
