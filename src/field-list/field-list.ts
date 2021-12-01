@@ -40,6 +40,14 @@ const generateStateFromValues = <V extends ValueMapList>(valueMapList: V) => {
 	return initialState;
 };
 
+class Wrapper<T extends ValueMapList> {
+	wrapped() {
+		return createFieldList<T>({} as T)
+	}
+}
+
+export type UseFieldListHook<T extends ValueMapList> = ReturnType<Wrapper<T>["wrapped"]>
+export type FieldListObject<T extends ValueMapList> = ReturnType<UseFieldListHook<T>>
 
 export const createFieldList = <V extends ValueMapList>(_initialValues: V) => {
 	type I = Widen<V>

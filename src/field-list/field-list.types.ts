@@ -9,14 +9,6 @@ export type StateMapList<V extends ValueMapList> = {
 	}>
 }
 
-export type FieldListItemActions<T extends FieldValue> = FieldActions<T> & {
-	remove: () => void
-}
-
-export type FieldRowActions = {
-	remove: () => void
-}
-
 export type FieldMapList<V extends ValueMapList> = Array<{
 	[key in keyof V[number]]: {
 		meta: FieldMeta<V[number][key]> & { isDirty: boolean },

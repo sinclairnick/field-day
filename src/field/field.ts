@@ -16,6 +16,15 @@ const generateMetaFromValue = <V extends FieldValue>(value: V) => {
 	return meta
 }
 
+
+class Wrapper<T extends FieldValue> {
+	wrapped() {
+		return createField<T>({} as T)
+	}
+}
+export type UseFieldHook<T extends FieldValue> = ReturnType<Wrapper<T>["wrapped"]>
+export type FieldObject<T extends FieldValue> = ReturnType<UseFieldHook<T>>
+
 export const createField = <V extends FieldValue>(_initialValue: V) => {
 	type I = Widen<V>
 	const _initialState = generateMetaFromValue(_initialValue)
