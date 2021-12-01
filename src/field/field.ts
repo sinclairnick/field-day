@@ -5,18 +5,9 @@ import { FieldActions, FieldMeta, FieldValue } from "..";
 import { generateFieldProps, usePrevious } from "../common/common.constants";
 import { useDelayedEffect } from "../util/use-delayed-effect";
 import { Widen } from "../util/util.types";
+import { FieldHelpers } from "./field.constants";
 import { UseFieldOptions } from "./field.types";
 
-const generateMetaFromValue = <V extends FieldValue>(value: V) => {
-	const meta: FieldMeta<V> = {
-		error: undefined,
-		isFocussed: false,
-		value: value as any,
-		wasTouched: false,
-		customData: {},
-	}
-	return meta
-}
 
 
 class Wrapper<T extends FieldValue> {
@@ -29,7 +20,7 @@ export type FieldObject<T extends FieldValue> = ReturnType<UseFieldHook<T>>
 
 export const createField = <V extends FieldValue>(_initialValue: V) => {
 	type I = Widen<V>
-	const _initialState = generateMetaFromValue(_initialValue)
+	const _initialState = FieldHelpers.generateMetaFromValue(_initialValue)
 	const fieldAtom = atom(_initialState as FieldMeta<I>)
 
 	const useField = (opts?: UseFieldOptions<I>) => {
@@ -46,10 +37,16 @@ export const createField = <V extends FieldValue>(_initialValue: V) => {
 		const otherActions = {
 			reset: () => { setState(initialState) },
 			setState,
-			setInitialValue: (value: I, opts?: { resetState?: boolean }) => {
+			setInitialValue: (
+				value: I,
+				opts?: {
+					resetState?: boolean
+					defaultMeta?: Parameters<typeof FieldHelpers["generateMetaFromValue"]>[1]
+				}
+			) => {
 				const { resetState = true } = opts ?? {}
 				setInitialValue(value)
-				const newInitialState = generateMetaFromValue(value)
+				const newInitialState = FieldHelpers.generateMetaFromValue(value, opts?.defaultMeta)
 				setInitialState(newInitialState)
 				if (resetState) {
 					setState(newInitialState)

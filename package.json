@@ -11,7 +11,7 @@
         "node": ">=10"
     },
     "scripts": {
-        "dev": "next dev ./example",
+        "dev": "next dev ./example -p 3333",
         "build": "microbundle build -f esm,cjs",
         "size": "size-limit",
         "analyze": "size-limit",

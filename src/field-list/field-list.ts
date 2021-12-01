@@ -9,39 +9,7 @@ import { UseFieldListOptions } from "..";
 import { isEqual } from "lodash";
 import { DeepPartial, Widen } from "../util/util.types";
 import { useDelayedEffect } from "../util/use-delayed-effect";
-
-const generateMetaFromValue = <F extends FieldValue>(value: F) => {
-	const meta: FieldMeta<typeof value> = {
-		error: undefined,
-		isFocussed: false,
-		value: value as any,
-		wasTouched: false,
-		customData: {}
-	}
-	return meta
-}
-
-const generateStateFromValues = <V extends ValueMapList>(valueMapList: V) => {
-	const initialState = {
-		customData: {},
-		listError: undefined,
-		items: [],
-		wasTouched: false,
-	} as StateMapList<V>;
-
-	for (const i in valueMapList) {
-		const item = valueMapList[i]
-
-		for (const key in item) {
-			const value = item[key];
-			const meta = generateMetaFromValue(value)
-
-			initialState.items[i] = { ...(initialState.items[i] ?? {}), [key]: meta }
-		}
-	}
-
-	return initialState;
-};
+import { FieldListHelpers } from "./field-list.constants";
 
 class Wrapper<T extends ValueMapList> {
 	wrapped() {
@@ -54,7 +22,7 @@ export type FieldListObject<T extends ValueMapList> = ReturnType<UseFieldListHoo
 
 export const createFieldList = <V extends ValueMapList>(_initialValues: V) => {
 	type I = Widen<V>
-	const _initialState = generateStateFromValues(_initialValues as I)
+	const _initialState = FieldListHelpers.generateStateFromValues(_initialValues as I)
 	const fieldListAtom = atom(_initialState);
 
 	const useFieldList = (opts?: UseFieldListOptions<I>) => {
@@ -82,10 +50,13 @@ export const createFieldList = <V extends ValueMapList>(_initialValues: V) => {
 				newState.listError = listError ?? undefined
 				setState(newState)
 			},
-			setInitialValues: (values: I, opts?: { resetState?: boolean }) => {
+			setInitialValues: (values: I, opts?: {
+				resetState?: boolean,
+				defaultMeta?: Parameters<typeof FieldListHelpers["generateMetaFromValue"]>[1]
+			}) => {
 				const { resetState = true } = opts ?? {}
 				setInitialValues(values)
-				const newInitialState = generateStateFromValues(values)
+				const newInitialState = FieldListHelpers.generateStateFromValues(values, opts?.defaultMeta)
 				setInitialState(newInitialState)
 				if (resetState) {
 					setState(newInitialState)
@@ -98,7 +69,7 @@ export const createFieldList = <V extends ValueMapList>(_initialValues: V) => {
 			append: (values: I[number]) => {
 				const newItem = {} as StateMapList<I>["items"][number]
 				for (const key in values) {
-					const meta = generateMetaFromValue(values[key])
+					const meta = FieldListHelpers.generateMetaFromValue(values[key])
 					newItem[key] = meta
 				}
 				setState({
@@ -109,7 +80,7 @@ export const createFieldList = <V extends ValueMapList>(_initialValues: V) => {
 			insert: (index: number, values: I[number]) => {
 				const newItem = {} as StateMapList<I>["items"][number]
 				for (const key in values) {
-					const meta = generateMetaFromValue(values[key])
+					const meta = FieldListHelpers.generateMetaFromValue(values[key])
 					newItem[key] = meta
 				}
 				const newItems = [...state.items]

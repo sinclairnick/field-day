@@ -8,28 +8,7 @@ import merge from "lodash/merge"
 import isEqual from "lodash/isEqual"
 import { DeepPartial, Widen } from '../util/util.types';
 import { useDelayedEffect } from '../util/use-delayed-effect';
-
-const generateStateFromValues = <V extends ValueMap>(valueMap: V) => {
-  const initialState = {
-    items: {},
-  } as StateMap<V>;
-
-  for (const key in valueMap) {
-    const value = valueMap[key];
-    type ValueType = V[typeof key];
-
-    const meta: FieldMeta<ValueType> = {
-      error: undefined,
-      isFocussed: false,
-      value: value as any,
-      wasTouched: false,
-      customData: {}
-    };
-    initialState.items[key] = meta;
-  }
-
-  return initialState;
-};
+import { FieldGroupHelpers } from './field-group.constants';
 
 class Wrapper<T extends ValueMap> {
   wrapper() {
@@ -42,7 +21,7 @@ export type FieldGroupObject<T extends ValueMap> = ReturnType<UseFieldGroupHook<
 
 export const createFieldGroup = <V extends ValueMap>(_initialValues: V) => {
   type I = Widen<V>
-  const _initialState = generateStateFromValues(_initialValues) as StateMap<I>
+  const _initialState = FieldGroupHelpers.generateStateFromValues(_initialValues) as StateMap<I>
   const fieldGroupAtom = atom(_initialState);
 
   const useFieldGroup = (opts?: UseFieldGroupOptions<I>) => {
@@ -71,10 +50,15 @@ export const createFieldGroup = <V extends ValueMap>(_initialValues: V) => {
       updateState: (to: DeepPartial<StateMap<I>>) => {
         setState(merge({ ...initialState }, { ...to }))
       },
-      setInitialValues: (values: I, opts?: { resetState?: boolean }) => {
+      setInitialValues: (
+        values: I,
+        opts?: {
+          resetState?: boolean,
+          defaultMeta?: Parameters<typeof FieldGroupHelpers["generateStateFromValues"]>[1]
+        }) => {
         const { resetState = true } = opts ?? {}
         setInitialValues(values)
-        const newInitialState = generateStateFromValues(values)
+        const newInitialState = FieldGroupHelpers.generateStateFromValues(values, opts?.defaultMeta)
         setInitialState(newInitialState)
         if (resetState) {
           setState(newInitialState)
