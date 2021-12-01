@@ -25,3 +25,9 @@ export type FieldProps<T extends FieldValue> = {
 export type FieldActions<T extends FieldValue> = {
 	setMeta: (meta: Partial<FieldMeta<T>>) => void,
 }
+
+export type BaseFieldObject<T extends FieldValue> = {
+	meta: FieldMeta<T>,
+	props: FieldProps<T>
+	actions: FieldActions<T>
+}
