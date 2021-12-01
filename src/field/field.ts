@@ -26,7 +26,6 @@ export const createField = <V extends FieldValue>(_initialValue: V) => {
 		const [state, setState] = useAtom(fieldAtom)
 
 		const { value } = state
-		const isFileList = Array.isArray(value)
 
 		const previousState = usePrevious(state)
 		const hasStateChange = !isEqual(previousState, state)
