@@ -1,7 +1,7 @@
 import { createField } from '../../src/field/field';
 import { createFieldGroup } from '../../src/field-group/field-group';
 import { createFieldList } from '../../dist';
-import { Box, } from '@mui/material';
+import { Box } from '@mui/material';
 
 const useProfileGroup = createFieldGroup({
 	name: '',
@@ -18,9 +18,7 @@ const usePicture = createField<File[]>([])
 
 const Index = () => {
 	const title = useTitle({ validate: (meta) => meta.value.length > 10 ? "Title too long" : undefined })
-	const picture = usePicture({ validate: (e) => {
-		return undefined
-	} })
+	const picture = usePicture()
 	const profile = useProfileGroup({
 		validate: (items) => {
 			const { isOver18, age } = items
