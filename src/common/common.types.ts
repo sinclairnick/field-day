@@ -7,9 +7,9 @@ export type ToPrimitive<T> =
 	: T extends number ? number
 	: T extends boolean ? boolean
 	: T;
-export type Widen<O> = {
+export type Widen<O> = O extends object ? {
 	[K in keyof O]: ToPrimitive<O[K]>
-}
+} : ToPrimitive<O>
 
 export type FieldValue = string | boolean | FileList
 
