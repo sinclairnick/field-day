@@ -2,10 +2,11 @@ import { atom, useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { UseFieldGroupOptions } from '..';
 import { generateFieldProps, usePrevious } from '../common/common.constants';
-import { DeepPartial, FieldActions, FieldMeta, FieldValue, Widen } from '../common/common.types';
+import { FieldActions, FieldMeta, FieldValue } from '../common/common.types';
 import { FieldMap, StateMap, ValueMap, } from './field-group.types';
 import merge from "lodash/merge"
 import isEqual from "lodash/isEqual"
+import { DeepPartial, Widen } from '../util/util.types';
 
 const generateStateFromValues = <V extends ValueMap>(valueMap: V) => {
   const initialState = {
@@ -47,7 +48,8 @@ export const createFieldGroup = <V extends ValueMap>(_initialValues: V) => {
         const errors = opts?.validate?.(state.items)
         const newState = { ...state }
         for (const key in state.items) {
-          newState.items[key].error = errors?.[key] ?? undefined
+          const error = errors?.[key]
+          newState.items[key].error = error ?? undefined
         }
         setState(newState)
       },

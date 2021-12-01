@@ -1,8 +1,9 @@
 import { atom, useAtom } from "jotai";
 import { isEqual } from "lodash";
 import { useEffect, useState } from "react";
-import { FieldActions, FieldMeta, FieldValue, Widen } from "..";
+import { FieldActions, FieldMeta, FieldValue } from "..";
 import { generateFieldProps, usePrevious } from "../common/common.constants";
+import { Widen } from "../util/util.types";
 import { UseFieldOptions } from "./field.types";
 
 const generateMetaFromValue = <V extends FieldValue>(value: V) => {
@@ -43,8 +44,8 @@ export const createField = <V extends FieldValue>(_initialValue: V) => {
 				}
 			},
 			validate: () => {
-				const error = opts?.validate?.(state) ?? undefined
-				setState({ ...state, error })
+				const error = opts?.validate?.(state)
+				setState({ ...state, error: error ?? undefined })
 			}
 		}
 

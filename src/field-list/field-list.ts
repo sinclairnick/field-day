@@ -2,11 +2,12 @@ import { atom, useAtom } from "jotai";
 import merge from "lodash/merge";
 import cloneDeep from "lodash/cloneDeep";
 import { useEffect, useState } from "react";
-import { DeepPartial, FieldActions, FieldMeta, FieldValue, Widen } from "../common/common.types";
+import { FieldActions, FieldMeta, FieldValue } from "../common/common.types";
 import { FieldMapList, StateMapList, ValueMapList } from "./field-list.types";
 import { generateFieldProps, usePrevious } from "../common/common.constants";
 import { UseFieldListOptions } from "..";
 import { isEqual } from "lodash";
+import { DeepPartial, Widen } from "../util/util.types";
 
 const generateMetaFromValue = <F extends FieldValue>(value: F) => {
 	const meta: FieldMeta<typeof value> = {
@@ -61,7 +62,8 @@ export const createFieldList = <V extends ValueMapList>(_initialValues: V) => {
 					const item = state.items[idx]
 					const errors = opts?.validateRow?.(item, Number(idx), state.items)
 					for (const key in state.items[idx]) {
-						newState.items[idx][key].error = errors?.[key] ?? undefined
+						const error = errors?.[key]
+						newState.items[idx][key].error = error ?? undefined
 					}
 				}
 				const listError = opts?.validateList?.(state.items)
