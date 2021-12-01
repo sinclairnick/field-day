@@ -16,12 +16,14 @@ const generateMetaFromValue = <F extends FieldValue>(value: F) => {
 		isFocussed: false,
 		value: value as any,
 		wasTouched: false,
+		customData: {}
 	}
 	return meta
 }
 
 const generateStateFromValues = <V extends ValueMapList>(valueMapList: V) => {
 	const initialState = {
+		customData: {},
 		listError: undefined,
 		items: [],
 		wasTouched: false,
@@ -162,14 +164,15 @@ export const createFieldList = <V extends ValueMapList>(_initialValues: V) => {
 			error: undefined,
 			isDirty: false,
 			isFocussed: false,
-			wasTouched: false
+			wasTouched: false,
+			customData: state.customData
 		}
 
 		for (const i in fields) {
 			const item = fields[i]
 			for (const key in item) {
 				const { meta } = item[key]
-				if (meta.error) listMeta.error = meta.error
+				if (listMeta.error === undefined && meta.error !== undefined) listMeta.error = meta.error
 				if (meta.isDirty) listMeta.isDirty = meta.isDirty
 				if (meta.isFocussed) listMeta.isFocussed = meta.isFocussed
 				if (meta.wasTouched) listMeta.wasTouched = meta.wasTouched

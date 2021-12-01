@@ -4,6 +4,7 @@ export type ValueMapList = { [key: string]: FieldValue }[]
 
 export type StateMapList<V extends ValueMapList> = {
 	listError: string | undefined
+	customData: { [key: string]: any }
 	items: Array<{
 		[key in keyof V[number]]: FieldMeta<V[number][key]>
 	}>

@@ -23,6 +23,7 @@ const generateStateFromValues = <V extends ValueMap>(valueMap: V) => {
       isFocussed: false,
       value: value as any,
       wasTouched: false,
+      customData: {}
     };
     initialState.items[key] = meta;
   }
@@ -106,7 +107,11 @@ export const createFieldGroup = <V extends ValueMap>(_initialValues: V) => {
     }
 
     const groupMeta: Omit<FieldMeta<any>, "value"> & { isDirty: boolean } = {
-      error: undefined, isDirty: false, isFocussed: false, wasTouched: false
+      error: undefined,
+      isDirty: false,
+      isFocussed: false,
+      wasTouched: false,
+      customData: state.customData
     }
 
     for (const key in fields) {

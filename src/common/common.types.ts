@@ -10,6 +10,8 @@ export type FieldMeta<T extends FieldValue> = {
 	wasTouched: boolean
 	error: string | undefined
 	value: T
+	/** Any custom data added to state. Empty object until user modifies */
+	customData: { [key: string]: any }
 }
 
 export type FieldProps<T extends FieldValue> = {

@@ -13,6 +13,7 @@ const generateMetaFromValue = <V extends FieldValue>(value: V) => {
 		isFocussed: false,
 		value: value as any,
 		wasTouched: false,
+		customData: {},
 	}
 	return meta
 }

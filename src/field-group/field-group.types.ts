@@ -3,6 +3,7 @@ import { FieldMeta, FieldProps, FieldActions } from "../common/common.types"
 export type ValueMap = { [key: string]: string | boolean }
 
 export type StateMap<V extends ValueMap> = {
+	customData: { [key: string]: any }
 	items: {
 		[key in keyof V]: FieldMeta<V[key]>
 	}
