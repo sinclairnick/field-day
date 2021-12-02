@@ -18,6 +18,6 @@ export type FieldMap<V extends ValueMap> = {
 }
 
 export type UseFieldGroupOptions<I extends ValueMap> = {
-	validate?: (meta: StateMap<I>["items"]) => Partial<{ [key in keyof I]: string | void | undefined }>
+	validate?: (meta: StateMap<I>["items"]) => Partial<{ [key in keyof I]: string | void | undefined } | void | undefined>
 	validationDelay?: number
 }

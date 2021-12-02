@@ -20,6 +20,6 @@ export type FieldMapList<V extends ValueMapList> = Array<{
 
 export type UseFieldListOptions<I extends ValueMapList> = {
 	validateList?: (meta: StateMapList<I>["items"]) => string | void | undefined,
-	validateRow?: (rowMeta: StateMapList<I>["items"][number], index: number, listMeta: StateMapList<I>["items"]) => Partial<{ [key in keyof I[number]]: string | void | undefined }>
+	validateRow?: (rowMeta: StateMapList<I>["items"][number], index: number, listMeta: StateMapList<I>["items"]) => Partial<{ [key in keyof I[number]]: string | void | undefined } | void | undefined>
 	validationDelay?: number
 }
