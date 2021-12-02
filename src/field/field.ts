@@ -37,6 +37,10 @@ export const createField = <V extends FieldValue>(_initialValue: V) => {
 		const otherActions = {
 			reset: () => { setState(initialState) },
 			setState,
+			collectValues: () => {
+				const value = state.value
+				return value
+			},
 			setInitialValue: (
 				value: I,
 				opts?: {

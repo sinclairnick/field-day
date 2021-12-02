@@ -50,6 +50,16 @@ export const createFieldList = <V extends ValueMapList>(_initialValues: V) => {
 				newState.listError = listError ?? undefined
 				setState(newState)
 			},
+			collectValues: () => {
+				const values = {} as { [key in keyof StateMapList<I>["items"][number]]: StateMapList<I>["items"][number][key]["value"] }[]
+				for (const i in state.items) {
+					const item = state.items[i]
+					for (const key in item) {
+						values[i][key] = item[key].value
+					}
+				}
+				return values
+			},
 			setInitialValues: (values: I, opts?: {
 				resetState?: boolean,
 				defaultMeta?: Parameters<typeof FieldListHelpers["generateMetaFromValue"]>[1]
