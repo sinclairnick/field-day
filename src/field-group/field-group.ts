@@ -52,7 +52,7 @@ export const createFieldGroup = <V extends ValueMap>(_initialValues: V) => {
         setState(merge({ ...initialState }, { ...to }))
       },
       collectValues: () => {
-        const values = {} as { [key in keyof StateMap<I>["items"]]: StateMap<I>["items"][key]["value"] }
+        const values = {} as I
         for (const key in state.items) {
           const item = state.items[key]
           values[key] = item.value
