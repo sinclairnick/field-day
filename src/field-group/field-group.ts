@@ -18,6 +18,7 @@ class Wrapper<T extends ValueMap> {
 
 export type UseFieldGroupHook<T extends ValueMap> = ReturnType<Wrapper<T>["wrapper"]>
 export type FieldGroupObject<T extends ValueMap> = ReturnType<UseFieldGroupHook<T>>
+export type FieldGroupState<T extends ValueMap> = StateMap<Widen<T>>
 
 export const createFieldGroup = <V extends ValueMap>(_initialValues: V) => {
   type I = Widen<V>
