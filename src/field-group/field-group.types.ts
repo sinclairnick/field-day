@@ -1,4 +1,5 @@
 import { FieldMeta, FieldProps, FieldActions } from "../common/common.types"
+import { FieldGroupHelpers } from "./field-group.constants"
 
 export type ValueMap = { [key: string]: string | boolean }
 
@@ -20,4 +21,10 @@ export type FieldMap<V extends ValueMap> = {
 export type UseFieldGroupOptions<I extends ValueMap> = {
 	validate?: (meta: StateMap<I>["items"]) => Partial<{ [key in keyof I]: string | void | undefined } | void | undefined>
 	validationDelay?: number
+	initialValues?: {
+		values: I,
+		resetState?: boolean,
+		defaultMeta?: Parameters<typeof FieldGroupHelpers["generateStateFromValues"]>[1]
+
+	}
 }

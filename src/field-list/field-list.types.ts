@@ -1,4 +1,5 @@
 import { FieldActions, FieldMeta, FieldProps, FieldValue } from "../common/common.types";
+import { FieldListHelpers } from "./field-list.constants";
 
 export type ValueMapList = { [key: string]: FieldValue }[]
 
@@ -22,4 +23,9 @@ export type UseFieldListOptions<I extends ValueMapList> = {
 	validateList?: (meta: StateMapList<I>["items"]) => string | void | undefined,
 	validateRow?: (rowMeta: StateMapList<I>["items"][number], index: number, listMeta: StateMapList<I>["items"]) => Partial<{ [key in keyof I[number]]: string | void | undefined } | void | undefined>
 	validationDelay?: number
+	initialValues?: {
+		values: I,
+		resetState?: boolean,
+		defaultMeta?: Parameters<typeof FieldListHelpers["generateMetaFromValue"]>[1]
+	}
 }

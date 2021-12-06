@@ -1,6 +1,6 @@
 import { atom, useAtom } from "jotai";
 import { isEqual } from "lodash";
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FieldActions, FieldMeta, FieldValue } from "..";
 import { generateFieldProps, usePrevious } from "../common/common.constants";
 import { useDelayedEffect } from "../util/use-delayed-effect";
@@ -20,12 +20,14 @@ export type FieldObject<T extends FieldValue> = ReturnType<UseFieldHook<T>>
 
 export const createField = <V extends FieldValue>(_initialValue: V) => {
 	type I = Widen<V>
-	const _initialState = FieldHelpers.generateMetaFromValue(_initialValue)
-	const fieldAtom = atom(_initialState as FieldMeta<I>)
+	const _initialState = FieldHelpers.generateMetaFromValue(_initialValue as I)
+	const fieldAtom = atom(_initialState)
+	const initialValueAtom = atom(_initialValue as I)
+	const initialStateAtom = atom(_initialState as FieldMeta<I>)
 
 	const useField = (opts?: UseFieldOptions<I>) => {
-		const [initialValue, setInitialValue] = useState(_initialValue as I)
-		const [initialState, setInitialState] = useState(_initialState as FieldMeta<I>)
+		const [initialValue, setInitialValue] = useAtom(initialValueAtom)
+		const [initialState, setInitialState] = useAtom(initialStateAtom)
 		const [state, setState] = useAtom(fieldAtom)
 		const { validationDelay = 100 } = opts ?? {}
 
@@ -34,28 +36,33 @@ export const createField = <V extends FieldValue>(_initialValue: V) => {
 		const previousState = usePrevious(state)
 		const hasStateChange = !isEqual(previousState, state)
 
+		const hasInitialValueChanged = opts?.initialValue?.value !== undefined && !isEqual(initialValue, opts?.initialValue?.value)
+
+		const _setInitialValue = (
+			value: I,
+			opts?: {
+				resetState?: boolean
+				defaultMeta?: Parameters<typeof FieldHelpers["generateMetaFromValue"]>[1]
+			}
+		) => {
+			const { resetState = true } = opts ?? {}
+			setInitialValue(value)
+			const newInitialState = FieldHelpers.generateMetaFromValue(value, opts?.defaultMeta)
+			setInitialState(newInitialState)
+			if (resetState) {
+				console.log("Setting new state", newInitialState)
+				setState(newInitialState)
+			}
+		}
+
 		const otherActions = {
-			reset: () => { setState(initialState) },
+			reset: () => setState(initialState),
 			setState,
 			collectValues: () => {
 				const value = state.value
 				return value
 			},
-			setInitialValue: (
-				value: I,
-				opts?: {
-					resetState?: boolean
-					defaultMeta?: Parameters<typeof FieldHelpers["generateMetaFromValue"]>[1]
-				}
-			) => {
-				const { resetState = true } = opts ?? {}
-				setInitialValue(value)
-				const newInitialState = FieldHelpers.generateMetaFromValue(value, opts?.defaultMeta)
-				setInitialState(newInitialState)
-				if (resetState) {
-					setState(newInitialState)
-				}
-			},
+			getInitialValue: () => initialValue,
 			validate: () => {
 				const error = opts?.validate?.(state)
 				setState({ ...state, error: error ?? undefined })
@@ -75,6 +82,21 @@ export const createField = <V extends FieldValue>(_initialValue: V) => {
 				otherActions.validate()
 			}
 		}, [hasStateChange, otherActions.validate], validationDelay)
+
+		useEffect(() => {
+			if (!hasInitialValueChanged) {
+				return
+			}
+			if (opts?.initialValue !== undefined) {
+				_setInitialValue(
+					opts.initialValue.value,
+					{
+						resetState: opts.initialValue?.resetState,
+						defaultMeta: opts.initialValue?.defaultMeta
+					}
+				)
+			}
+		}, [hasInitialValueChanged, _setInitialValue])
 
 		return {
 			actions: {

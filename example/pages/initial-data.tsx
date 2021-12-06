@@ -1,26 +1,32 @@
 import { Box } from "@mui/material"
+import { useEffect, useState } from "react"
 import { createField } from "../../src"
 
 const useField = createField("")
+const useField2 = createField("")
 
 const InitialDataPage = () => {
-	const field = useField()
+	const [initialValue, setInitialValue] = useState("Will change in 2 seconds")
+	const field2 = useField2({
+		initialValue: {
+			value: initialValue,
+			defaultMeta: { wasTouched: true }
+		}
+	})
+
+	useEffect(() => {
+		setTimeout(() => {
+			setInitialValue("Changed!")
+		}, 2000)
+	}, [])
 
 	return <Box>
-		<input {...field.props} />
-		<button onClick={field.actions.reset}>Reset to initial state</button>
-		<button onClick={() => field.actions.setInitialValue(
-			field.meta.value,
-			{
-				defaultMeta: {
-					wasTouched: true,
-				}
-			}
-		)}>
-			Set initial with wasTouched = true
-		</button>
-
-		<pre>{JSON.stringify(field.meta)}</pre>
+		<fieldset>
+			<legend>Field 2</legend>
+			<input {...field2.props} />
+			<pre>{JSON.stringify(field2.meta)}</pre>
+			<pre>{JSON.stringify(field2.actions.getInitialValue())}</pre>
+		</fieldset>
 
 	</Box>
 }

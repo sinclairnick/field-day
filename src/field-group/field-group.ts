@@ -1,5 +1,5 @@
 import { atom, useAtom } from 'jotai';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { UseFieldGroupOptions } from '..';
 import { generateFieldProps, usePrevious } from '../common/common.constants';
 import { FieldActions, FieldMeta, FieldValue } from '../common/common.types';
@@ -22,17 +22,37 @@ export type FieldGroupState<T extends ValueMap> = StateMap<Widen<T>>
 
 export const createFieldGroup = <V extends ValueMap>(_initialValues: V) => {
   type I = Widen<V>
-  const _initialState = FieldGroupHelpers.generateStateFromValues(_initialValues) as StateMap<I>
+  const _initialState = FieldGroupHelpers.generateStateFromValues(_initialValues as I)
   const fieldGroupAtom = atom(_initialState);
+  const initialValuesAtom = atom(_initialValues as I)
+  const initialStateAtom = atom(_initialState as StateMap<I>)
 
   const useFieldGroup = (opts?: UseFieldGroupOptions<I>) => {
-    const [initialValues, setInitialValues] = useState(_initialValues as I)
-    const [initialState, setInitialState] = useState(_initialState)
+    const [initialValues, setInitialValues] = useAtom(initialValuesAtom)
+    const [initialState, setInitialState] = useAtom(initialStateAtom)
     const [state, setState] = useAtom(fieldGroupAtom);
     const { validationDelay = 100 } = opts ?? {}
 
     const previousState = usePrevious(state)
     const hasStateChanged = !isEqual(previousState, state)
+
+    const previousInitialValues = usePrevious(initialValues)
+    const hasInitialValuesChanged = !isEqual(previousInitialValues, opts?.initialValues?.values)
+
+    const _setInitialValues = (
+      values: I,
+      opts?: {
+        resetState?: boolean,
+        defaultMeta?: Parameters<typeof FieldGroupHelpers["generateStateFromValues"]>[1]
+      }) => {
+      const { resetState = true } = opts ?? {}
+      setInitialValues(values)
+      const newInitialState = FieldGroupHelpers.generateStateFromValues(values, opts?.defaultMeta)
+      setInitialState(newInitialState)
+      if (resetState) {
+        setState(newInitialState)
+      }
+    }
 
     const actions = {
       validate: () => {
@@ -44,10 +64,9 @@ export const createFieldGroup = <V extends ValueMap>(_initialValues: V) => {
         }
         setState(newState)
       },
+      getState: () => state,
       setState,
-      reset: () => {
-        setState(initialState)
-      },
+      reset: () => setState(initialState),
       updateState: (to: DeepPartial<StateMap<I>>) => {
         setState(merge({ ...initialState }, { ...to }))
       },
@@ -59,20 +78,7 @@ export const createFieldGroup = <V extends ValueMap>(_initialValues: V) => {
         }
         return values
       },
-      setInitialValues: (
-        values: I,
-        opts?: {
-          resetState?: boolean,
-          defaultMeta?: Parameters<typeof FieldGroupHelpers["generateStateFromValues"]>[1]
-        }) => {
-        const { resetState = true } = opts ?? {}
-        setInitialValues(values)
-        const newInitialState = FieldGroupHelpers.generateStateFromValues(values, opts?.defaultMeta)
-        setInitialState(newInitialState)
-        if (resetState) {
-          setState(newInitialState)
-        }
-      }
+      getInitialValues: () => initialValues,
     }
 
     useDelayedEffect(() => {
@@ -80,6 +86,21 @@ export const createFieldGroup = <V extends ValueMap>(_initialValues: V) => {
         actions.validate()
       }
     }, [hasStateChanged, actions.validate, validationDelay], validationDelay)
+
+    useEffect(() => {
+      if (!hasInitialValuesChanged) {
+        return
+      }
+      if (opts?.initialValues !== undefined) {
+        _setInitialValues(
+          opts.initialValues.values,
+          {
+            resetState: opts.initialValues.resetState,
+            defaultMeta: opts.initialValues.defaultMeta
+          }
+        )
+      }
+    }, [hasInitialValuesChanged, _setInitialValues])
 
 
     const fields = {} as FieldMap<I>;
