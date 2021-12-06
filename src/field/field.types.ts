@@ -8,5 +8,5 @@ export type UseFieldOptions<V extends FieldValue> = {
 		value: V,
 		resetState?: boolean,
 		defaultMeta?: Parameters<typeof FieldHelpers["generateMetaFromValue"]>[1]
-	}
+	} | undefined
 }

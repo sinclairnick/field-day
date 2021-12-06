@@ -26,5 +26,5 @@ export type UseFieldGroupOptions<I extends ValueMap> = {
 		resetState?: boolean,
 		defaultMeta?: Parameters<typeof FieldGroupHelpers["generateStateFromValues"]>[1]
 
-	}
+	} | undefined
 }

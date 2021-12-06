@@ -27,5 +27,5 @@ export type UseFieldListOptions<I extends ValueMapList> = {
 		values: I,
 		resetState?: boolean,
 		defaultMeta?: Parameters<typeof FieldListHelpers["generateMetaFromValue"]>[1]
-	}
+	} | undefined
 }
