@@ -57,8 +57,9 @@ export const createFieldList = <V extends ValueMapList>(_initialValues: V) => {
 				setState(newState)
 			},
 			collectValues: () => {
-				const values = {} as I
+				const values = [] as any as I
 				for (const i in state.items) {
+					values[i] = {}
 					const item = state.items[i]
 					for (const key in item) {
 						values[i][key] = item[key].value
