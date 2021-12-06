@@ -1,7 +1,7 @@
 import { atom, useAtom } from "jotai";
 import merge from "lodash/merge";
 import cloneDeep from "lodash/cloneDeep";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { FieldActions, FieldMeta, FieldValue } from "../common/common.types";
 import { FieldMapList, StateMapList, ValueMapList } from "./field-list.types";
 import { generateFieldProps, usePrevious } from "../common/common.constants";
@@ -32,7 +32,7 @@ export const createFieldList = <V extends ValueMapList>(_initialValues: V) => {
 		const [initialValues, setInitialValues] = useAtom(initialValuesAtom)
 		const [initialState, setInitialState] = useAtom(initialStateAtom)
 		const [state, setState] = useAtom(fieldListAtom)
-		
+
 		const { validationDelay = 100 } = opts ?? {}
 
 		const previousState = usePrevious(state)
