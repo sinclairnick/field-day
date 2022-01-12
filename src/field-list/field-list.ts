@@ -111,7 +111,8 @@ export const createFieldList = <V extends ValueMapList>(_initialValues: V) => {
 				setState({ ...state, items: newItems })
 			},
 			remove: (index: number) => {
-				const newItems = state.items.filter((_, i) => i !== index)
+				const newItems = [...state.items]
+				newItems.splice(index, 1)
 				setState({ ...state, items: newItems })
 			},
 			reset: (to?: StateMapList<I>) => {
