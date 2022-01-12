@@ -26,7 +26,7 @@ export namespace FieldListHelpers {
 
 			for (const key in item) {
 				const value = item[key];
-				const meta = generateMetaFromValue(value, defaultMeta)
+				const meta = FieldListHelpers.generateMetaFromValue(value, defaultMeta)
 
 				initialState.items[i] = { ...(initialState.items[i] ?? {}), [key]: meta }
 			}

@@ -1,6 +1,4 @@
-import { createField } from '../../src/field/field';
-import { createFieldGroup } from '../../src/field-group/field-group';
-import { createFieldList } from '../../dist';
+import { createFieldGroup, createFieldList, createField } from '../../src';
 import { Box } from '@mui/material';
 
 const useProfileGroup = createFieldGroup({
@@ -15,6 +13,11 @@ const useFriendsList = createFieldList<{
 
 const useTitle = createField("")
 const usePicture = createField<File[]>([])
+
+const useMoveSettings = createFieldGroup({
+	from: '0',
+	to: '0'
+})
 
 const Index = () => {
 	const title = useTitle({ validate: (meta) => meta.value.length > 10 ? "Title too long" : undefined })
@@ -43,9 +46,11 @@ const Index = () => {
 			}
 		}
 	})
+	const moveSettings = useMoveSettings()
 
-	const handleSetInitialValues = () => {
-		profile.actions.setInitialValues({ isOver18: true, age: "12", name: "Johnny" })
+	const handleMoveRows = () => {
+		const { from, to } = moveSettings.actions.collectValues()
+		friends.actions.move(Number(from), Number(to))
 	}
 
 	return (
@@ -85,7 +90,6 @@ const Index = () => {
 						type="checkbox"
 						{...profile.fields.isOver18.props}
 					/>
-					<button onClick={handleSetInitialValues}>Set initial state</button>
 				</fieldset>
 
 			</Box>
@@ -95,6 +99,13 @@ const Index = () => {
 					<h1>Field list ("Friends")</h1>
 					<p>Form meta</p>
 					<pre>{JSON.stringify(friends.meta)}</pre>
+					<p>Move row </p>
+					<label htmlFor="from">From</label>
+					<input type="number" id="from" {...moveSettings.fields.from.props} />
+					<label htmlFor="to">To</label>
+					<input type="number" id="to" {...moveSettings.fields.to.props} />
+					<button onClick={handleMoveRows}>Move</button>
+					<hr />
 					{friends.fields.map((friend, i) => <Box key={i}>
 						<input {...friend.name.props} />
 						<select {...friend.relationship.props}>

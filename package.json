@@ -12,7 +12,7 @@
     },
     "scripts": {
         "dev": "next dev ./example -p 3333",
-        "build": "microbundle build -f esm,cjs",
+        "build": "microbundle build -f esm,cjs --sourcemap false",
         "size": "size-limit",
         "analyze": "size-limit",
         "prepublish": "npm run build"
