@@ -48,3 +48,17 @@ export const generateFieldProps = <V extends FieldValue>(
 
 	return { ...props, value: value as any }
 }
+
+// Borrowed from https://github.com/sindresorhus/array-move/blob/main/index.js
+export const arrayMove = (array: any[], fromIndex: number, toIndex: number) => {
+	const _array = [...array]
+	const startIndex = fromIndex < 0 ? _array.length + fromIndex : fromIndex;
+
+	if (startIndex >= 0 && startIndex < _array.length) {
+		const endIndex = toIndex < 0 ? _array.length + toIndex : toIndex;
+
+		const [item] = _array.splice(fromIndex, 1);
+		_array.splice(endIndex, 0, item);
+	}
+	return _array
+}

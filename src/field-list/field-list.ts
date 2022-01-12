@@ -4,7 +4,7 @@ import cloneDeep from "lodash/cloneDeep";
 import { useEffect } from "react";
 import { FieldActions, FieldMeta, FieldValue } from "../common/common.types";
 import { FieldMapList, StateMapList, ValueMapList } from "./field-list.types";
-import { generateFieldProps, usePrevious } from "../common/common.constants";
+import { arrayMove, generateFieldProps, usePrevious } from "../common/common.constants";
 import { UseFieldListOptions } from "..";
 import { isEqual } from "lodash";
 import { DeepPartial, Widen } from "../util/util.types";
@@ -107,13 +107,8 @@ export const createFieldList = <V extends ValueMapList>(_initialValues: V) => {
 				setState({ ...state, items: newItems })
 			},
 			move: (indexFrom: number, indexTo: number) => {
-				const existingItem = state.items[indexFrom]
-				const newItems = [...state.items]
-				newItems.splice(indexTo, 0, existingItem)
-				setState({
-					...state,
-					items: newItems.filter((_, i) => i !== indexFrom)
-				})
+				const newItems = arrayMove(state.items, indexFrom, indexTo)
+				setState({ ...state, items: newItems })
 			},
 			remove: (index: number) => {
 				const newItems = state.items.filter((_, i) => i !== index)
