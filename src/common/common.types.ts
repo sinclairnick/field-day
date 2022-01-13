@@ -6,6 +6,7 @@ export type FormTargetEvent<T extends FieldValue> =
 	: { target: { value: string } }
 
 export type FieldMeta<T extends FieldValue> = {
+	_id: string
 	isFocussed: boolean
 	wasTouched: boolean
 	error: string | undefined

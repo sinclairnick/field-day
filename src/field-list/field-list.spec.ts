@@ -98,7 +98,32 @@ describe("Field list", () => {
 			expect(result.current.fields[1].name.meta.value).toBe("Thing 4")
 			expect(result.current.fields[2].name.meta.value).toBe("Thing 1")
 			expect(result.current.fields[3].name.meta.value).toBe("Thing 3")
+		})
 
+
+	})
+
+	describe("Ids", () => {
+
+		test("Retains list item ids upon moving", () => {
+			const useFieldList = createFieldList([
+				{ name: "Thing 1" },
+				{ name: "Thing 2" },
+				{ name: "Thing 3" },
+			])
+			const { result } = renderHook(() => useFieldList())
+
+			const initialIds = result.current.fields.map(f => f.name.meta._id)
+
+			act(() => {
+				result.current.actions.move(0, 1)
+			})
+			const resultingIds = result.current.fields.map(f => f.name.meta._id)
+
+			// Reordered IDs
+			expect(initialIds[0]).toBe(resultingIds[1])
+			expect(initialIds[1]).toBe(resultingIds[0])
+			expect(initialIds[2]).toBe(resultingIds[2])
 		})
 
 	})

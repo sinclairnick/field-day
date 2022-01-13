@@ -120,7 +120,7 @@ export const createFieldGroup = <V extends ValueMap>(_initialValues: V) => {
       fields[key] = { meta: { ...meta, isDirty }, props, actions, };
     }
 
-    const groupMeta: Omit<FieldMeta<any>, "value"> & { isDirty: boolean } = {
+    const groupMeta: Omit<FieldMeta<any>, "value" | "_id"> & { isDirty: boolean } = {
       error: undefined,
       isDirty: false,
       isFocussed: false,

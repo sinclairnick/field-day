@@ -10,6 +10,7 @@ specifiers:
   '@types/lodash': ^4.14.177
   '@types/react': ^17.0.37
   '@types/react-dom': ^17.0.11
+  '@types/uuid': ^8.3.4
   husky: ^7.0.4
   jest: ^27.4.7
   jotai: 1.4.5
@@ -24,11 +25,13 @@ specifiers:
   tsdx: ^0.14.1
   tslib: ^2.3.1
   typescript: ^4.5.2
+  uuid: ^8.3.2
 
 dependencies:
   '@types/lodash': 4.14.177
   jotai: 1.4.5_react@17.0.2
   lodash: 4.17.21
+  uuid: 8.3.2
 
 devDependencies:
   '@emotion/react': 11.7.0_cfedea9b3ed0faf0dded75c187406c5e
@@ -39,6 +42,7 @@ devDependencies:
   '@types/jest': 27.4.0
   '@types/react': 17.0.37
   '@types/react-dom': 17.0.11
+  '@types/uuid': 8.3.4
   husky: 7.0.4
   jest: 27.4.7
   jsdom: 19.0.0
@@ -2654,6 +2658,10 @@ packages:
 
   /@types/stack-utils/2.0.1:
     resolution: {integrity: sha512-Hl219/BT5fLAaz6NDkSuhzasy49dwQS/DSdu4MdggFB8zcXv7vflBI3xp7FEmkmdDkBUI2bPUNeMttp2knYdxw==}
+    dev: true
+
+  /@types/uuid/8.3.4:
+    resolution: {integrity: sha512-c/I8ZRb51j+pYGAu5CrFMRxqZ2ke4y2grEBO5AUjgSkSk+qT2Ea+OdWElz/OiMf5MNpn2b17kuVBwZLQJXzihw==}
     dev: true
 
   /@types/yargs-parser/20.2.1:
@@ -10730,6 +10738,11 @@ packages:
     deprecated: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
     hasBin: true
     dev: true
+
+  /uuid/8.3.2:
+    resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    hasBin: true
+    dev: false
 
   /v8-compile-cache/2.3.0:
     resolution: {integrity: sha512-l8lCEmLcLYZh4nbunNZvQCJc5pv7+RCwa8q/LdUx8u7lsWvPDKmpodJAJNwkAhJC//dFY48KuIEmjtd4RViDrA==}

@@ -170,7 +170,7 @@ export const createFieldList = <V extends ValueMapList>(_initialValues: V) => {
 			}
 		}
 
-		const listMeta: Omit<FieldMeta<any>, "value"> & { isDirty: boolean } = {
+		const listMeta: Omit<FieldMeta<any>, "value" | "_id"> & { isDirty: boolean } = {
 			error: undefined,
 			isDirty: false,
 			isFocussed: false,
